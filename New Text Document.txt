@@ -1,0 +1,131 @@
+--- uvm(universal verification methodology)-------
+->  we have sv  why we come uvm
+uvm is not a language it is methodology 
+ to perform more better tb we are using uvm
+  uvm have base class which is extendable
+  here we have advance conncept like config db,tlm,report class like etc--------------------uvm root----------
+  It is one of the base class in uvm 
+  it is a single tone class instation  done globaly
+   when functionality start user call uvm-root
+   uvm root create variable called as  phases
+   by using phases we can raise and drop the objection
+   -------------uvm objection------------
+ 1.  mechanisam used by uvm_root  when to finish simulation
+ 2.  a component  raise the objection  to indicate that component functionality as started
+   syntax:- phaise.raise objection(this) 
+   this represent current class
+3.   a component  drop the objection  to indicate that component functionality as completed
+   syntax:phase.drop_objection(this)
+4.   IN general tb we raise and drop the objection in two places
+   1)test:run_phase
+   2)sequnce:body task
+      we can not raise and drop objection in driver/monitor/coverage/sqr?because (forever running functionality)
+5.                  	  objection are better than $ finish?why?
+	  objection:objection give  a gracious finish to simulation
+	  $finish:simulation ends at abruptly
+6. if raised objection are not droped  simulation will hang and time out 9200sec
+--------set drain time------
+provide extra time for last transaction
+syntax: phase.phase_done.set_drain_time(this,200)
+
+
+
+------what is the differnce between object and component-----------
+object                                         component
+object have only one             component have two argument(parent ,child)
+ argument(parent)
+object won't be available       component are available through out tje tb  
+through out the test bench       life cycle
+life cycle               
+object are created and destory        ex:-driver,monitor,etc----
+when ever user want
+ex:sequnce
+
+--------factory------------
+factory is a global data base of all tb component 
+by using factory we can register object and component
+   
+   syntax:objection:`uvm_object_utils(class_name)
+
+   syntax:component:`uvm_component_utils(class_name)
+
+
+  ex:Consider a sugar tablet factory.
+
+The formula for preparing the sugar tablet is very important.
+
+There are two ways to store the formula:
+
+   1. Writing Formula on Paper
+     .Every worker must carry the paper
+     .If paper is lost, formula is lost
+     .Difficult to access everywhere
+     .Need manual handling every time
+2. Storing Formula in Server
+     .Formula stored in central server
+      .Any machine can access it anytime
+      . No need to carry paper
+       .Easy to modify and reuse
+       .All departments can use same formula
+
+
+Relation to UVM Factory
+In UVM, factory registration works like the server.
+--------Differnce between create and new()---------
+*new: it dos not give flexibility to change the defination as per current  test requirment
+ex:drv=new("drv,this);
+simolar to using paper definition (fromula on paper)to create the tablets
+*create:it gives flexibility to change the defination as per currenrt test requirment
+using factory defination(fromula register to server) to creat the tabler.updating the definition is easy.since it is on server and globally accessible in whole testbench
+syntax example:apb_drv drv;
+               drv=apb_drv::type_id::creat("drv",this)
+			  
+NOTE: when a class is not registered to the  factory,it is compulsory to usenew
+-------Factory methods----
+.print
+.set_type_override_by_type
+.set_type_override_by_name
+.set_inst_override _by_type
+.set_inst_override_by_name
+
+
+typeoverride and instance override 
+these methods are used to replace one class with another class dynamically
+meaing:whenever a particular class is created any  where in the test bench ,replace it with another class
+----Difference Between by_type and by_name------
+by_type             	by_name
+Uses class handles    	Uses string names
+Faster                 	Slower
+Compile-time checking	Runtime checking
+Mostly preferred	     Less preferred
+
+syntax:set_type_override_by_type-----
+set_type_override_by_type(
+   original_class::get_type(),
+   override_class::get_type()
+);
+
+set_type_overrideset_type_override_by_type(
+   packet::get_type(),
+   error_packet::get_type()
+);_by_name
+
+--instance _override--
+Meaning:Replace class only at a specific location (instance path) in testbench.Not everywhere
+
+Main Difference: Type vs Instance Override
+Type Override	            Instance Override
+Applied everywhere	        Applied only specific location
+Global replacement     	    Local replacement
+Same override in entire TB  Override only one component
+Easy for full TB changes    Easy for selective changesset_-----inst_override_by_type Syntax----
+syntax:set_inst_override_by_type(
+   original_class::get_type(),
+   override_class::get_type(),
+   "instance_path"
+);
+--by name:set_inst_override_by_name(
+   "original_class_name",
+   "override_class_name",
+   "instance_path"
+);
